@@ -5,6 +5,17 @@ const zeroPosition = (position) => {
 	return position - 136;
 }
 
+const angleWithinElement = (evt, element) => {
+	const clickX = evt.clientX;
+	const clickY = evt.clientY;
+	const boundingRect = element.getBoundingClientRect();
+	const refX = boundingRect.left;
+	const refY = boundingRect.top;
+	const relativeX = (clickX - refX) - 300;
+	const relativeY = -((clickY - refY) - 300);
+	return Math.atan2(relativeY, relativeX) * (180 / Math.PI) + 180;
+}
+
 class PhoneOption extends React.Component {
 
 	render() {
@@ -49,15 +60,8 @@ export class PhoneSelector extends React.Component {
 	}
 
 	render() {
-		const {
-			onSelect
-		} = this.props;
-
-		const {
-			offset
-		} = this.state;
-
-		// console.log("Offset", offset);
+		const { onSelect } = this.props;
+		const {	offset } = this.state;
 
 		const optionComponents = []; 
 		for (let i = 1; i <= 9; i++) {
@@ -70,13 +74,11 @@ export class PhoneSelector extends React.Component {
 			<div 
 				className="phone-box"
 				ref={(box) => { this.phoneBox = box; }}
-					onMouseDown={this.onMouseDown.bind(this)}
-					onMouseMove={this.onMouseMove.bind(this)}
-					onMouseUp={this.onMouseUp.bind(this)}
+				onMouseDown={this.onMouseDown.bind(this)}
+				onMouseMove={this.onMouseMove.bind(this)}
+				onMouseUp={this.onMouseUp.bind(this)}
 			>
-				<div 
-					className="phone-ring"
-				>
+				<div className="phone-ring">
 					<div className="phone-ring-inner"></div>
 					{optionComponents}
 				</div>
@@ -85,14 +87,7 @@ export class PhoneSelector extends React.Component {
 	}
 
 	onMouseDown(evt) {
-		const clickX = evt.clientX;
-		const clickY = evt.clientY;
-		const refX = this.phoneBox.getBoundingClientRect().left;
-		const refY = this.phoneBox.getBoundingClientRect().top;
-		const relativeX = (clickX - refX) - 300;
-		const relativeY = -((clickY - refY) - 300);
-		const theta = Math.atan2(relativeY, relativeX) * (180 / Math.PI) + 180;
-		// console.log(theta);
+		const theta = angleWithinElement(evt, this.phoneBox);
 		this.setState({
 			mouseDown: true,
 			downAngle: theta,
@@ -101,16 +96,8 @@ export class PhoneSelector extends React.Component {
 
 	onMouseMove(evt) {
 		if (this.state.mouseDown) {
-			const clickX = evt.clientX;
-			const clickY = evt.clientY;
-			const refX = this.phoneBox.getBoundingClientRect().left;
-			const refY = this.phoneBox.getBoundingClientRect().top;
-			const relativeX = (clickX - refX) - 300;
-			const relativeY = -((clickY - refY) - 300);
-			const theta = Math.atan2(relativeY, relativeX) * (180 / Math.PI) + 180;
-			// console.log(theta);
+			const theta = angleWithinElement(evt, this.phoneBox);
 			const diff = (this.state.downAngle - theta) % 360;
-			// console.log("diff", diff, "down", this.state.downAngle, "now", theta);
 
 			this.setState({
 				currentAngle: theta,
