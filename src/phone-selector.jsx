@@ -72,7 +72,7 @@ export class PhoneSelector extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			prevOffset: 0,
+			savedOffset: 0,
 			offset: 0,
 			downAngle: 0,
 			mouseDown: false,
@@ -125,10 +125,18 @@ export class PhoneSelector extends React.Component {
 		if (this.state.mouseDown) {
 			const theta = angleWithinElement(evt, this.phoneBox);
 			const diff = ((theta - this.state.downAngle) + 360) % 360;
-			const offset = ((this.state.prevOffset + diff) +360) % 360;
 
-			// If we reached the stop point, stop there and up the mouse.
-			if (offset > 324) {
+			const prevOffset = this.state.offset;
+			const offset = ((this.state.savedOffset + diff) +360) % 360;
+
+			// Don't allow turning the wheel clockwise.
+			if (prevOffset < 180 && 324 < offset) {
+				this.setState({
+					offset: 0,
+					mouseDown: false,
+				});
+			}
+			else if (prevOffset > 180 && 324 < offset) {
 				this.setState({
 					offset: 324,
 					mouseDown: false,
@@ -145,7 +153,7 @@ export class PhoneSelector extends React.Component {
 	onMouseUp(evt) {
 		this.setState({
 			mouseDown: false,
-			prevOffset: this.state.offset,
+			savedOffset: this.state.offset,
 		});
 	}
 }
