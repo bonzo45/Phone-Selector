@@ -97,6 +97,16 @@ export class PhoneSelector extends React.Component {
 			)
 		}
 
+		const outerClasses = classNames(
+			"phone-ring",
+			{ glow: this.state.mouseDown }
+		);
+
+		const innerClasses = classNames(
+			"phone-ring-inner",
+			{ glow: this.state.mouseDown }
+		);
+
 		return (
 			<div 
 				className="phone-box"
@@ -105,8 +115,8 @@ export class PhoneSelector extends React.Component {
 				onMouseMove={this.onMouseMove.bind(this)}
 				onMouseUp={this.onMouseUp.bind(this)}
 			>
-				<div className="phone-ring">
-					<div className="phone-ring-inner"></div>
+				<div className={outerClasses}>
+					<div className={innerClasses}></div>
 					{optionComponents}
 				</div>
 			</div>
