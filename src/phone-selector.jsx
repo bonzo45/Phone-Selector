@@ -29,6 +29,17 @@ const angleWithinElement = (evt, element) => {
 	return ((Math.atan2(relativeY, relativeX) * (180 / Math.PI)) +360) % 360;
 }
 
+const StopMarker = ({position}) => {
+	return (
+		<div
+		 	className={"stop-marker"}
+		 	style={{transform: 'rotate(' + zeroPosition(position) + 'deg)'}}
+	 	>
+	 		<div className={"stop-marker-visible"}></div>
+	 	</div>
+	)
+}
+
 class PhoneOption extends React.Component {
 
 	render() {
@@ -117,6 +128,8 @@ export class PhoneSelector extends React.Component {
 			>
 				<div className={outerClasses}>
 					<div className={innerClasses}></div>
+					<StopMarker position={36} />
+					<StopMarker position={0} />
 					{optionComponents}
 				</div>
 			</div>
