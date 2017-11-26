@@ -1,10 +1,22 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+/**
+ * Converts a logical rotation, i.e. 0 degrees is the first item
+ * in the selector, to the rotation required in the DOM.
+ */
 const zeroPosition = (position) => {
 	return position - 136;
 }
 
+/**
+ * Returns the angle between 0 and 360 degrees
+ * for a click event within an element.
+ * 0   -> middle right
+ * 90  -> middle top
+ * 180 -> middle left
+ * 270 -> middle bottom
+ */
 const angleWithinElement = (evt, element) => {
 	const clickX = evt.clientX;
 	const clickY = evt.clientY;
@@ -13,7 +25,7 @@ const angleWithinElement = (evt, element) => {
 	const refY = boundingRect.top;
 	const relativeX = (clickX - refX) - 300;
 	const relativeY = -((clickY - refY) - 300);
-	return Math.atan2(relativeY, relativeX) * (180 / Math.PI) + 180;
+	return ((Math.atan2(relativeY, relativeX) * (180 / Math.PI)) +360) % 360;
 }
 
 class PhoneOption extends React.Component {
@@ -24,11 +36,11 @@ class PhoneOption extends React.Component {
 		const zeroedPosition = zeroPosition(position);
 
 		const wrapperStyles = {
-			transform: 'rotate(' + zeroedPosition + 'deg)'
+			transform: 'rotate(' + (-zeroedPosition) + 'deg)'
 		};
 		
 		const optionStyles = {
-			transform: 'rotate(' + (-zeroedPosition) + 'deg)'
+			transform: 'rotate(' + zeroedPosition + 'deg)'
 		};
 
 		return (
@@ -54,7 +66,6 @@ export class PhoneSelector extends React.Component {
 			prevOffset: 0,
 			offset: 0,
 			downAngle: 0,
-			currentAngle: 0,
 			mouseDown: false,
 		};
 	}
@@ -62,6 +73,8 @@ export class PhoneSelector extends React.Component {
 	render() {
 		const { onSelect } = this.props;
 		const {	offset } = this.state;
+			
+		console.log("Current offset: ", offset);
 
 		const optionComponents = []; 
 		for (let i = 1; i <= 9; i++) {
@@ -97,11 +110,10 @@ export class PhoneSelector extends React.Component {
 	onMouseMove(evt) {
 		if (this.state.mouseDown) {
 			const theta = angleWithinElement(evt, this.phoneBox);
-			const diff = (this.state.downAngle - theta) % 360;
-
+			const diff = ((theta - this.state.downAngle) + 360) % 360;
+			const offset = ((this.state.prevOffset + diff) +360) % 360;
 			this.setState({
-				currentAngle: theta,
-				offset: this.state.prevOffset + diff,
+				offset: offset
 			});
 		}
 	}
