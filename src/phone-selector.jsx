@@ -59,12 +59,29 @@ class PhoneOption extends React.Component {
 			transform: 'rotate(' + (-zeroedPosition) + 'deg)'
 		};
 
-		const optionClasses = classNames("option", { selected: selected });
+		const optionUnselectedWrapperClasses = classNames(
+			"option-selection-wrapper",
+			 { visible: !selected }
+		 );
+		const optionSelectedWrapperClasses = classNames(
+			"option-selection-wrapper",
+			"selected",
+			 { visible: selected }
+		 );
 
 		return (
-			<div className="option-wrapper" style={wrapperStyles}>
-				<div className={optionClasses} style={optionStyles}>
-					{text}
+			<div className="option-rotation-wrapper" style={wrapperStyles}>
+				<div className="option-inner-rotation-wrapper" style={optionStyles}>
+					<div className={optionUnselectedWrapperClasses}>
+						<div className="option">
+							{text}
+						</div>
+					</div>
+					<div className={optionSelectedWrapperClasses}>
+						<div className="option selected">
+							{text}
+						</div>
+					</div>
 				</div>
 			</div>
 		)
