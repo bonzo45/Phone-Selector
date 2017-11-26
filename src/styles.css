@@ -40,9 +40,9 @@
 
 .stop-marker {
 	width: 500px;
-	height: 20px;
+	height: 10px;
 	position: absolute;
-	top: 240px;
+	top: 245px;
 	
 	z-index: 1;
 }
@@ -89,7 +89,8 @@
 }
 
 body {
-    font-family: 'Roboto Mono', monospace;
+	font-family: 'Space Mono', monospace;
+    font-size: 34px;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;

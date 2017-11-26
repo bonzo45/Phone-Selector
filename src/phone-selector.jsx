@@ -129,7 +129,7 @@ export class PhoneSelector extends React.Component {
 			>
 				<div className={outerClasses}>
 					<div className={innerClasses}></div>
-					<StopMarker position={36} />
+					<StopMarker position={36 - (10 / (Math.PI * 500)) * 360} />
 					<StopMarker position={0} />
 					{optionComponents}
 				</div>
