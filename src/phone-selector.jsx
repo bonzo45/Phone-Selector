@@ -209,7 +209,7 @@ export class PhoneSelector extends React.Component {
 
 			// The time to animate over.
 			const startTime = new Date().getTime();
-			const duration = 1000;
+			const duration = (offsetToTravel / 324) * 1000;
 
 			// Every 60th of a second, update the offset until we're there.
 			const interval = setInterval(() => {
