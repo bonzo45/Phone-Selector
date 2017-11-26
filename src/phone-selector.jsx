@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 /**
  * Converts a logical rotation, i.e. 0 degrees is the first item
@@ -31,22 +32,28 @@ const angleWithinElement = (evt, element) => {
 class PhoneOption extends React.Component {
 
 	render() {
-		const { position } = this.props;
+		const { 
+			position,
+		 	text,
+		 	selected
+		} = this.props;
 
 		const zeroedPosition = zeroPosition(position);
 
 		const wrapperStyles = {
-			transform: 'rotate(' + (-zeroedPosition) + 'deg)'
+			transform: 'rotate(' + zeroedPosition + 'deg)'
 		};
 		
 		const optionStyles = {
-			transform: 'rotate(' + zeroedPosition + 'deg)'
+			transform: 'rotate(' + (-zeroedPosition) + 'deg)'
 		};
+
+		const optionClasses = classNames("option", { selected: selected });
 
 		return (
 			<div className="option-wrapper" style={wrapperStyles}>
-				<div className="option" style={optionStyles}>
-					Hi
+				<div className={optionClasses} style={optionStyles}>
+					{text}
 				</div>
 			</div>
 		)
@@ -54,7 +61,9 @@ class PhoneOption extends React.Component {
 }
 
 PhoneOption.PropTypes = {
-	position: PropTypes.number.isRequired
+	position: PropTypes.number.isRequired,
+	text: PropTypes.string.isRequired,
+	selected: PropTypes.bool,
 }
 
 
@@ -74,12 +83,17 @@ export class PhoneSelector extends React.Component {
 		const { onSelect } = this.props;
 		const {	offset } = this.state;
 			
-		console.log("Current offset: ", offset);
-
 		const optionComponents = []; 
 		for (let i = 1; i <= 9; i++) {
+			const position = (36 * i) - offset;
+			const selected = 0 <= position && position < 36;
 			optionComponents.push(
-				<PhoneOption key={"option" + i} position={offset + (36 * i)} />,
+				<PhoneOption
+					key={"option" + i}
+				 	position={position}
+				 	text={i + ""}
+				 	selected={selected}
+			 	/>,
 			)
 		}
 
@@ -112,9 +126,19 @@ export class PhoneSelector extends React.Component {
 			const theta = angleWithinElement(evt, this.phoneBox);
 			const diff = ((theta - this.state.downAngle) + 360) % 360;
 			const offset = ((this.state.prevOffset + diff) +360) % 360;
-			this.setState({
-				offset: offset
-			});
+
+			// If we reached the stop point, stop there and up the mouse.
+			if (offset > 324) {
+				this.setState({
+					offset: 324,
+					mouseDown: false,
+				});
+			}
+			else {
+				this.setState({
+					offset: offset
+				});
+			}
 		}
 	}
 	

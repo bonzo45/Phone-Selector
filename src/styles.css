@@ -55,7 +55,12 @@
 	border: 5px solid black;
 }
 
+.option.selected {
+	background-color: red;
+}
+
 body {
+    font-family: 'Roboto Mono', monospace;
     -moz-user-select: none;
     -webkit-user-select: none;
     -ms-user-select: none;
