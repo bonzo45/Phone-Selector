@@ -87,6 +87,7 @@ export class PhoneSelector extends React.Component {
 			offset: 0,
 			downAngle: 0,
 			mouseDown: false,
+			interactionBlocked: false
 		};
 	}
 
@@ -137,14 +138,23 @@ export class PhoneSelector extends React.Component {
 	}
 
 	onMouseDown(evt) {
+		if (this.state.interactionBlocked) {
+			return;
+		}
+
 		const theta = angleWithinElement(evt, this.phoneBox);
 		this.setState({
 			mouseDown: true,
 			downAngle: theta,
+			savedOffset: this.state.offset,
 		});
 	}
 
 	onMouseMove(evt) {
+		if (this.state.interactionBlocked) {
+			return;
+		}
+		
 		if (this.state.mouseDown) {
 			const theta = angleWithinElement(evt, this.phoneBox);
 			const diff = ((theta - this.state.downAngle) + 360) % 360;
@@ -174,9 +184,48 @@ export class PhoneSelector extends React.Component {
 	}
 	
 	onMouseUp(evt) {
+		if (this.state.interactionBlocked) {
+			return;
+		}
+		
 		this.setState({
 			mouseDown: false,
 			savedOffset: this.state.offset,
+		}, this.returnToStart);
+	}
+
+	returnToStart() {
+		// Stop interaction with the phone.
+		this.setState({
+			interactionBlocked: true
+		}, () => {
+			// Save the starting offset.
+			const initialOffset = this.state.savedOffset;
+
+			// Save the desired offset.
+			const desiredOffset = 0;
+
+			const offsetToTravel = initialOffset - desiredOffset;
+
+			// The time to animate over.
+			const startTime = new Date().getTime();
+			const duration = 1000;
+
+			// Every 60th of a second, update the offset until we're there.
+			const interval = setInterval(() => {
+				const currentTime = new Date().getTime();
+				const timeElapsed = currentTime - startTime;
+				const fractionComplete = timeElapsed / duration;
+				this.setState({
+					offset: (1 - Math.min(1, fractionComplete)) * offsetToTravel,
+				})
+				if (fractionComplete >= 1) {
+					this.setState({
+						interactionBlocked: false,
+					});
+					clearInterval(interval);
+				}
+			}, 17);
 		});
 	}
 }
