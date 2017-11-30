@@ -7,7 +7,7 @@ import classNames from 'classnames';
  * in the selector, to the rotation required in the DOM.
  */
 const zeroPosition = (position) => {
-	return position - 136;
+	return -position - 180;
 }
 
 /**
@@ -146,8 +146,8 @@ export class PhoneSelector extends React.Component {
 			>
 				<div className={outerClasses}>
 					<div className={innerClasses}></div>
-					<StopMarker position={36 - (10 / (Math.PI * 500)) * 360} />
-					<StopMarker position={0} />
+					<StopMarker position={36} />
+					<StopMarker position={0 + (10 / (Math.PI * 500)) * 360} />
 					{optionComponents}
 				</div>
 			</div>
@@ -174,7 +174,7 @@ export class PhoneSelector extends React.Component {
 		
 		if (this.state.mouseDown) {
 			const theta = angleWithinElement(evt, this.phoneBox);
-			const diff = ((theta - this.state.downAngle) + 360) % 360;
+			const diff = ((this.state.downAngle - theta) + 360) % 360;
 
 			const prevOffset = this.state.offset;
 			const offset = ((this.state.savedOffset + diff) +360) % 360;
