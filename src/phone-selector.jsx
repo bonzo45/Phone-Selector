@@ -10,8 +10,9 @@ const SEGMENT_ANGLE = 360 / NUM_SEGMENTS;
 const PHONE_SIZE = 600;
 const DIAL_SIZE = 500;
 const DIAL_INNER_SIZE = 300;
-const OPTION_SIZE = 60;
+const OPTION_SIZE = 70;
 const OPTION_BORDER_SIZE = 5;
+const OPTION_SHADOW_SIZE = 5;
 
 const MARKER_THICKNESS = 8;
 
@@ -108,21 +109,23 @@ class PhoneOption extends React.Component {
 		}
 
 		const optionUnselectedStyle = {
-			width: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
-			height: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
+			width: OPTION_SIZE - 2 * OPTION_BORDER_SIZE - 2 * OPTION_SHADOW_SIZE,
+			height: OPTION_SIZE - 2 * OPTION_BORDER_SIZE - 2 * OPTION_SHADOW_SIZE,
 			border: OPTION_BORDER_SIZE + "px solid black",
 			borderRadius: (OPTION_SIZE - 2 * OPTION_BORDER_SIZE / 2),
-			left: 0,
-			top: 0,
+			left: OPTION_SHADOW_SIZE,
+			top: OPTION_SHADOW_SIZE,
+			boxShadow: '0px 0px ' + OPTION_SHADOW_SIZE + 'px #000000',
 		}
 		
 		const optionSelectedStyle = {
-			width: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
-			height: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
+			width: OPTION_SIZE - 2 * OPTION_BORDER_SIZE - 2 * OPTION_SHADOW_SIZE,
+			height: OPTION_SIZE - 2 * OPTION_BORDER_SIZE - 2 * OPTION_SHADOW_SIZE,
 			border: OPTION_BORDER_SIZE + "px solid black",
 			borderRadius: (OPTION_SIZE - 2 * OPTION_BORDER_SIZE / 2),
-			left: 0,
-			bottom: 0,
+			left: OPTION_SHADOW_SIZE,
+			bottom: OPTION_SHADOW_SIZE,
+			boxShadow: '0px 0px ' + OPTION_SHADOW_SIZE + 'px #000000',
 		}
 
 		return (
