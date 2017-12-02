@@ -225,6 +225,16 @@ export class PhoneSelector extends React.Component {
 			{ glow: this.state.mouseDown }
 		);
 
+		const stopComponents = [];
+		const startAngle = (MARKER_THICKNESS / (Math.PI * DIAL_SIZE)) * 360;
+		const stopAngle = SEGMENT_ANGLE;
+		const stops = (((Math.PI * DIAL_SIZE) * (SEGMENT_ANGLE / 360)) / MARKER_THICKNESS) * 1.1;
+		for (let i = 0; i < stops; i++) {
+			stopComponents.push(
+				<StopMarker position={startAngle + (stopAngle - startAngle) * i / (stops - 1)} />
+			)
+		}
+
 		return (
 			<div 
 				ref={(box) => { this.phoneBox = box; }}
@@ -242,8 +252,7 @@ export class PhoneSelector extends React.Component {
 						className={phoneRingInnerClasses}
 						style={phoneRingInnerStyle}
 					></div>
-					<StopMarker position={SEGMENT_ANGLE} />
-					<StopMarker position={(MARKER_THICKNESS / (Math.PI * DIAL_SIZE)) * 360} />
+					{stopComponents}
 					{optionComponents}
 				</div>
 			</div>
