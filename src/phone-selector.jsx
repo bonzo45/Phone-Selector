@@ -182,10 +182,14 @@ export class PhoneSelector extends React.Component {
 		const { onSelect } = this.props;
 		const {	offset } = this.state;
 			
+		this.selectedOption = -1;
 		const optionComponents = []; 
 		for (let i = 0; i < NUM_OPTIONS; i++) {
 			const position = (SEGMENT_ANGLE * (i + 2)) - offset;
 			const selected = 0 <= position && position < SEGMENT_ANGLE;
+			if (selected) {
+				this.selectedOption = i;
+			}
 			optionComponents.push(
 				<PhoneOption
 					key={"option" + i}
@@ -308,6 +312,11 @@ export class PhoneSelector extends React.Component {
 	onMouseUp(evt) {
 		if (this.state.interactionBlocked) {
 			return;
+		}
+
+		// Work out which thing is selected?
+		if (this.selectedOption !== -1) {
+			this.props.onSelect(this.selectedOption);
 		}
 		
 		this.setState({
