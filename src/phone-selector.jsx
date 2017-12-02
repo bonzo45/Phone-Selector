@@ -2,12 +2,25 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 
+
+const NUM_OPTIONS = 10;
+const NUM_SEGMENTS = NUM_OPTIONS + 2;
+const SEGMENT_ANGLE = 360 / NUM_SEGMENTS;
+
+const PHONE_SIZE = 600;
+const DIAL_SIZE = 500;
+const DIAL_INNER_SIZE = 300;
+const OPTION_SIZE = 60;
+const OPTION_BORDER_SIZE = 5;
+
+const MARKER_THICKNESS = 8;
+
 /**
  * Converts a logical rotation, i.e. 0 degrees is the first item
  * in the selector, to the rotation required in the DOM.
  */
 const zeroPosition = (position) => {
-	return -position - 180;
+	return -position - 180 + SEGMENT_ANGLE;
 }
 
 /**
@@ -24,16 +37,23 @@ const angleWithinElement = (evt, element) => {
 	const boundingRect = element.getBoundingClientRect();
 	const refX = boundingRect.left;
 	const refY = boundingRect.top;
-	const relativeX = (clickX - refX) - 300;
-	const relativeY = -((clickY - refY) - 300);
-	return ((Math.atan2(relativeY, relativeX) * (180 / Math.PI)) +360) % 360;
+	const relativeX = (clickX - refX) - (PHONE_SIZE / 2);
+	const relativeY = -((clickY - refY) - (PHONE_SIZE / 2));
+	return ((Math.atan2(relativeY, relativeX) * (180 / Math.PI)) + 360) % 360;
 }
 
 const StopMarker = ({position}) => {
 	return (
 		<div
 		 	className={"stop-marker"}
-		 	style={{transform: 'rotate(' + zeroPosition(position) + 'deg)'}}
+		 	style={
+		 		{
+		 			width: DIAL_SIZE,
+		 			height: MARKER_THICKNESS,
+		 			top: (DIAL_SIZE - MARKER_THICKNESS) / 2,
+		 			transform: 'rotate(' + zeroPosition(position) + 'deg)',
+		 		}
+		 	}
 	 	>
 	 		<div className={"stop-marker-visible"}></div>
 	 	</div>
@@ -51,34 +71,82 @@ class PhoneOption extends React.Component {
 
 		const zeroedPosition = zeroPosition(position);
 
-		const wrapperStyles = {
-			transform: 'rotate(' + zeroedPosition + 'deg)'
+		const rotationWrapperStyle = {
+			width: DIAL_SIZE,
+			height: OPTION_SIZE,
+			top: (DIAL_SIZE - OPTION_SIZE) / 2,
+			transform: 'rotate(' + zeroedPosition + 'deg)',
 		};
 		
-		const optionStyles = {
+		const innerRotationWrapperStyle = {
+			width: OPTION_SIZE,
+			height: OPTION_SIZE,
+			marginLeft: (((DIAL_SIZE - DIAL_INNER_SIZE) / 2) - OPTION_SIZE) / 2,
 			transform: 'rotate(' + (-zeroedPosition) + 'deg)'
 		};
 
 		const optionUnselectedWrapperClasses = classNames(
-			"option-selection-wrapper",
-			 { visible: !selected }
-		 );
-		const optionSelectedWrapperClasses = classNames(
-			"option-selection-wrapper",
-			"selected",
-			 { visible: selected }
+			"option-selection-wrapper"
 		 );
 
+		const unselectedWrapperStyle = {
+			left: 0,
+			top: 0,
+			width: OPTION_SIZE,
+			height: !selected ? OPTION_SIZE : 0,
+		}
+
+		const optionSelectedWrapperClasses = classNames(
+			"option-selection-wrapper"
+		 );
+
+		const selectedWrapperStyle = {
+			left: 0,
+			bottom: 0,
+			width: OPTION_SIZE,
+			height: selected ? OPTION_SIZE : 0,
+		}
+
+		const optionUnselectedStyle = {
+			width: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
+			height: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
+			border: OPTION_BORDER_SIZE + "px solid black",
+			borderRadius: (OPTION_SIZE - 2 * OPTION_BORDER_SIZE / 2),
+			left: 0,
+			top: 0,
+		}
+		
+		const optionSelectedStyle = {
+			width: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
+			height: OPTION_SIZE - 2 * OPTION_BORDER_SIZE,
+			border: OPTION_BORDER_SIZE + "px solid black",
+			borderRadius: (OPTION_SIZE - 2 * OPTION_BORDER_SIZE / 2),
+			left: 0,
+			bottom: 0,
+		}
+
 		return (
-			<div className="option-rotation-wrapper" style={wrapperStyles}>
-				<div className="option-inner-rotation-wrapper" style={optionStyles}>
-					<div className={optionUnselectedWrapperClasses}>
-						<div className="option">
+			<div className="option-rotation-wrapper" style={rotationWrapperStyle}>
+				<div className="option-inner-rotation-wrapper" style={innerRotationWrapperStyle}>
+					<div
+						className={optionUnselectedWrapperClasses}
+						style={unselectedWrapperStyle}
+					>
+						<div
+							className="option"
+							style={optionUnselectedStyle}
+						>
 							{text}
 						</div>
 					</div>
-					<div className={optionSelectedWrapperClasses}>
-						<div className="option selected">
+					<div
+						className={optionSelectedWrapperClasses}
+						style={selectedWrapperStyle}
+					>
+						<div
+							className="option selected"
+							style={optionSelectedStyle}
+						>
 							{text}
 						</div>
 					</div>
@@ -93,7 +161,6 @@ PhoneOption.PropTypes = {
 	text: PropTypes.string.isRequired,
 	selected: PropTypes.bool,
 }
-
 
 export class PhoneSelector extends React.Component {
 	
@@ -113,9 +180,9 @@ export class PhoneSelector extends React.Component {
 		const {	offset } = this.state;
 			
 		const optionComponents = []; 
-		for (let i = 1; i <= 9; i++) {
-			const position = (36 * i) - offset;
-			const selected = 0 <= position && position < 36;
+		for (let i = 0; i < NUM_OPTIONS; i++) {
+			const position = (SEGMENT_ANGLE * (i + 2)) - offset;
+			const selected = 0 <= position && position < SEGMENT_ANGLE;
 			optionComponents.push(
 				<PhoneOption
 					key={"option" + i}
@@ -125,29 +192,55 @@ export class PhoneSelector extends React.Component {
 			 	/>,
 			)
 		}
+		
+		const phoneBoxStyle = {
+			width: PHONE_SIZE,
+			height: PHONE_SIZE,
+		}
 
-		const outerClasses = classNames(
+		const phoneRingStyle = {
+			width: DIAL_SIZE,
+			height: DIAL_SIZE,
+			borderRadius: DIAL_SIZE / 2,
+		}
+
+		const phoneRingClasses = classNames(
 			"phone-ring",
 			{ glow: this.state.mouseDown }
 		);
+		
+		const phoneRingInnerStyle = {
+			width: DIAL_INNER_SIZE,
+			height: DIAL_INNER_SIZE,
+			borderRadius: DIAL_INNER_SIZE / 2,
+			top: (DIAL_SIZE - DIAL_INNER_SIZE) / 2,
+			left: (DIAL_SIZE - DIAL_INNER_SIZE) / 2,
+		}
 
-		const innerClasses = classNames(
+		const phoneRingInnerClasses = classNames(
 			"phone-ring-inner",
 			{ glow: this.state.mouseDown }
 		);
 
 		return (
 			<div 
-				className="phone-box"
 				ref={(box) => { this.phoneBox = box; }}
+				className="phone-box"
+				style={phoneBoxStyle}
 				onMouseDown={this.onMouseDown.bind(this)}
 				onMouseMove={this.onMouseMove.bind(this)}
 				onMouseUp={this.onMouseUp.bind(this)}
 			>
-				<div className={outerClasses}>
-					<div className={innerClasses}></div>
-					<StopMarker position={36} />
-					<StopMarker position={0 + (10 / (Math.PI * 500)) * 360} />
+				<div
+					className={phoneRingClasses}
+					style={phoneRingStyle}
+				>
+					<div
+						className={phoneRingInnerClasses}
+						style={phoneRingInnerStyle}
+					></div>
+					<StopMarker position={SEGMENT_ANGLE} />
+					<StopMarker position={(MARKER_THICKNESS / (Math.PI * DIAL_SIZE)) * 360} />
 					{optionComponents}
 				</div>
 			</div>
@@ -179,16 +272,16 @@ export class PhoneSelector extends React.Component {
 			const prevOffset = this.state.offset;
 			const offset = ((this.state.savedOffset + diff) +360) % 360;
 
-			// Don't allow turning the wheel clockwise.
-			if (prevOffset < 180 && 324 < offset) {
+			// Don't allow turning the wheel anti-clockwise.
+			if (prevOffset < 180 && (360 - SEGMENT_ANGLE) < offset) {
 				this.setState({
 					offset: 0,
 					mouseDown: false,
 				});
 			}
-			else if (prevOffset > 180 && 324 < offset) {
+			else if (prevOffset > 180 && (360 - SEGMENT_ANGLE) < offset) {
 				this.setState({
-					offset: 324,
+					offset: (360 - SEGMENT_ANGLE),
 					mouseDown: false,
 				});
 			}
@@ -226,7 +319,7 @@ export class PhoneSelector extends React.Component {
 
 			// The time to animate over.
 			const startTime = new Date().getTime();
-			const duration = (offsetToTravel / 324) * 1000;
+			const duration = (offsetToTravel / (360 - SEGMENT_ANGLE)) * 1000;
 
 			// Every 60th of a second, update the offset until we're there.
 			const interval = setInterval(() => {
@@ -242,7 +335,7 @@ export class PhoneSelector extends React.Component {
 					});
 					clearInterval(interval);
 				}
-			}, 17);
+			}, (1000 / 60));
 		});
 	}
 }
