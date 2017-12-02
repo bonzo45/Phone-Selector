@@ -235,7 +235,10 @@ export class PhoneSelector extends React.Component {
 		const stops = (((Math.PI * DIAL_SIZE) * (SEGMENT_ANGLE / 360)) / MARKER_THICKNESS) * 1.1;
 		for (let i = 0; i < stops; i++) {
 			stopComponents.push(
-				<StopMarker position={startAngle + (stopAngle - startAngle) * i / (stops - 1)} />
+				<StopMarker
+					key={"stop_" + i}
+				 	position={startAngle + (stopAngle - startAngle) * i / (stops - 1)}
+				/>
 			)
 		}
 
